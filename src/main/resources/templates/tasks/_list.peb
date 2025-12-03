@@ -1,0 +1,12 @@
+<ul id="task-list" aria-describedby="result-count">
+  {% for task in page.items %}
+      {% include "tasks/_item.peb" with {"task": task} %}
+  {% else %}
+      <li>No tasks found.</li>
+  {% endfor %}
+</ul>
+
+<p id="result-count" class="visually-hidden">
+  Showing {{ page.items|length }} of {{ page.totalItems }} tasks
+  {% if query %} matching "{{ query }}"{% endif %}
+</p>

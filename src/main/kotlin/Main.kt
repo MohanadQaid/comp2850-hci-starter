@@ -206,6 +206,12 @@ fun Application.configureSessions() {
  * - Task CRUD: `/tasks`, `/tasks/{id}`, etc.
  */
 fun Application.configureRouting() {
+    intercept(ApplicationCallPipeline.Setup) {
+        if (call.sessions.get<SessionData>() == null) {
+            call.sessions.set(SessionData())
+        }
+    }
+
     routing {
         // Static files (CSS, JS, HTMX library)
         staticResources("/static", "static")
