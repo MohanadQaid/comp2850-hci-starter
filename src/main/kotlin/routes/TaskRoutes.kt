@@ -174,7 +174,15 @@ fun Route.taskRoutes() {
             val error = call.request.queryParameters["error"]
 
             if (call.isHtmx()) {
-                val w = renderFragmentWriter(pebble, "tasks/_edit.peb", mapOf("task" to task, "error" to error))
+                val w = renderFragmentWriter(
+                    pebble,
+                    "tasks/_edit.peb",
+                    mapOf(
+                        "task" to task,
+                        "error" to (error ?: "")
+                    )
+                )
+
                 return@timed call.respondText(w.toString(), ContentType.Text.Html)
             }
 
@@ -185,7 +193,7 @@ fun Route.taskRoutes() {
                 "title" to "Tasks",
                 "page" to Page.paginate(all, 1, 10),
                 "editingId" to id,
-                "errorMessage" to error
+                "errorMessage" to error.orEmpty()
             ))
             call.respondText(writer.toString(), ContentType.Text.Html)
         }

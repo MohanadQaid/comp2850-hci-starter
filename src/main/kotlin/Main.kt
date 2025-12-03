@@ -56,17 +56,7 @@ import io.ktor.util.*
  * @see <a href="https://htmx.org/docs/">HTMX Documentation</a>
  * @see <a href="https://www.w3.org/WAI/WCAG22/quickref/">WCAG 2.2 Quick Reference</a>
  */
-fun main() {
-    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
-    val host = "0.0.0.0" // Required for Codespaces
 
-    embeddedServer(Netty, port = port, host = host) {
-        configureLogging()
-        configureTemplating()
-        configureSessions()
-        configureRouting()
-    }.start(wait = true)
-}
 
 /**
  * Configure request logging for development and debugging.
@@ -82,6 +72,24 @@ fun Application.configureLogging() {
         }
     }
 }
+
+
+fun Application.configureRouting() {
+
+    // Ensure session exists (AFTER Sessions plugin)
+    intercept(ApplicationCallPipeline.Plugins) {
+        if (call.sessions.get<SessionData>() == null) {
+            call.sessions.set(SessionData())
+        }
+    }
+
+    routing {
+        staticResources("/static", "static")
+        configureHealthCheck()
+        taskRoutes()
+    }
+}
+
 
 /**
  * Configure Pebble templating engine.
@@ -144,8 +152,13 @@ suspend fun ApplicationCall.renderTemplate(
     val writer = StringWriter()
     val template = engine.getTemplate(templateName)
 
-    // Add global context available to all templates
-    val sessionData = sessions.get<SessionData>()
+    // SAFE session lookup (prevents SessionNotYetConfiguredException)
+    val sessionData = try {
+        sessions.get<SessionData>()
+    } catch (e: Exception) {
+        null
+    }
+
     val enrichedContext =
         context +
             mapOf(
@@ -156,6 +169,7 @@ suspend fun ApplicationCall.renderTemplate(
     template.evaluate(writer, enrichedContext)
     return writer.toString()
 }
+
 
 /**
  * Check if request is from HTMX (progressive enhancement mode).
@@ -205,22 +219,17 @@ fun Application.configureSessions() {
  * - Health check: `/health`
  * - Task CRUD: `/tasks`, `/tasks/{id}`, etc.
  */
-fun Application.configureRouting() {
-    intercept(ApplicationCallPipeline.Setup) {
-        if (call.sessions.get<SessionData>() == null) {
-            call.sessions.set(SessionData())
-        }
-    }
 
-    routing {
-        // Static files (CSS, JS, HTMX library)
-        staticResources("/static", "static")
 
-        // Health check endpoint (for monitoring)
-        configureHealthCheck()
 
-        // Task management routes (main feature)
-        // TODO: Week 6 Lab 1 - Implement taskRoutes()
-        taskRoutes()
-    }
+fun main() {
+    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
+    val host = "0.0.0.0" // Required for Codespaces
+
+    embeddedServer(Netty, port = port, host = host) {
+        configureLogging()
+        configureSessions()
+        configureTemplating()
+        configureRouting()
+    }.start(wait = true)
 }
