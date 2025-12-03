@@ -1,11 +1,10 @@
 <nav aria-label="Pagination">
   <ul class="pagination">
 
-    {# Previous Page #}
-    {% if page.currentPage > 1 %}
+    {% if page.hasPrevious %}
       <li>
-        <a href="/tasks?q={{ query|default('') }}&page={{ page.currentPage - 1 }}"
-           hx-get="/tasks/fragment?q={{ query|default('') }}&page={{ page.currentPage - 1 }}"
+        <a href="/tasks?q={{ query }}&page={{ page.previousPage }}"
+           hx-get="/tasks/fragment?q={{ query }}&page={{ page.previousPage }}"
            hx-target="#task-area"
            hx-push-url="true">
           Previous
@@ -13,15 +12,12 @@
       </li>
     {% endif %}
 
-    <li aria-current="page">
-      Page {{ page.currentPage }} of {{ page.totalPages }}
-    </li>
+    <li aria-current="page">Page {{ page.currentPage }} of {{ page.totalPages }}</li>
 
-    {# Next Page #}
-    {% if page.currentPage < page.totalPages %}
+    {% if page.hasNext %}
       <li>
-        <a href="/tasks?q={{ query|default('') }}&page={{ page.currentPage + 1 }}"
-           hx-get="/tasks/fragment?q={{ query|default('') }}&page={{ page.currentPage + 1 }}"
+        <a href="/tasks?q={{ query }}&page={{ page.nextPage }}"
+           hx-get="/tasks/fragment?q={{ query }}&page={{ page.nextPage }}"
            hx-target="#task-area"
            hx-push-url="true">
           Next

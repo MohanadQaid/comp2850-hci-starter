@@ -5,19 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}COMP2850 Task Manager{% endblock %}</title>
 
-    {# Pico CSS for baseline accessible styles (WCAG 2.2 AA compliant) #}
+    {# Pico CSS baseline styling #}
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="/static/css/custom.css">
 
-    {# HTMX for progressive enhancement #}
-    <script src="/static/js/htmx-1.9.12.min.js" defer></script>
+    {# HTMX for progressive enhancement — must load early, no defer #}
+    <script src="/static/js/htmx-1.9.12.min.js"></script>
+
+    <style>
+        /* Accessible skip link (WCAG 2.4.1) */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            padding: 8px;
+            background: #000;
+            color: #fff;
+            z-index: 1000;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+    </style>
 </head>
+
 <body>
-    {# Skip link for keyboard navigation (WCAG 2.4.1) #}
+
+    {# Skip link — allows keyboard users to jump to main content #}
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    {# ARIA live region for dynamic status announcements (WCAG 4.1.3) #}
-    {# Polite: non-interrupting announcements after current speech finishes #}
+    {# Global ARIA live region for HTMX updates #}
     <div id="status" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <header>
@@ -28,33 +45,34 @@
             <ul>
                 <li><a href="/tasks">Tasks</a></li>
                 <li><a href="/health">Health</a></li>
+                <li><a href="/about">About</a></li>   {# Fixed missing text #}
             </ul>
         </nav>
     </header>
 
-    {# Main landmark for screen readers (WCAG 1.3.1) #}
-    {# tabindex="-1" allows programmatic focus for skip link #}
+    {# Main content area #}
     <main id="main" tabindex="-1">
         {% block content %}
-        {# Page-specific content goes here #}
         {% endblock %}
     </main>
 
     <footer>
         <p>
             <small>
-                COMP2850 HCI &bull; Server-first architecture &bull;
-                <a href="https://htmx.org/docs/" target="_blank" rel="noopener">HTMX Docs</a> &bull;
-                <a href="https://www.w3.org/WAI/WCAG22/quickref/" target="_blank" rel="noopener">WCAG 2.2</a> &bull;
-                <a href="/about"></a>
+                COMP2850 HCI • Server-first architecture •
+                <a href="https://htmx.org/docs/" target="_blank" rel="noopener">HTMX Docs</a> •
+                <a href="https://www.w3.org/WAI/WCAG22/quickref/" target="_blank" rel="noopener">WCAG 2.2</a>
             </small>
         </p>
+
         <p>
             <small>
-                Session: {{ sessionId }} &bull;
+                Session: {{ sessionId }}
+                &bull;
                 Mode: {% if isHtmx %}HTMX{% else %}No-JS{% endif %}
             </small>
         </p>
     </footer>
+
 </body>
 </html>

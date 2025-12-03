@@ -1,31 +1,42 @@
 {% extends "_layout/base.peb" %}
 
 {% block content %}
+
 <h1>Tasks</h1>
 
-{# Add Task Form - Week 6 #}
+{# ===============================
+   Add Task Form
+   =============================== #}
 <section aria-labelledby="add-heading">
   <h2 id="add-heading">Add a new task</h2>
+
   <form action="/tasks" method="post"
         hx-post="/tasks"
-        hx-target="#task-list"
-        hx-swap="beforeend">
+        hx-target="#task-area"
+        hx-swap="innerHTML">
+
     <label for="title">Title</label>
     <input type="text" id="title" name="title" required
-           placeholder="e.g., Buy milk" aria-describedby="title-hint">
+           placeholder="e.g., Buy milk"
+           aria-describedby="title-hint">
+
     <small id="title-hint">Keep it short and specific.</small>
-    <input type="text" name="priority" placeholder="Priority (optional)">
+
     <button type="submit">Add Task</button>
   </form>
 </section>
 
+
+{# ===============================
+   Filtering
+   =============================== #}
 <section aria-labelledby="filter-heading">
   <h2 id="filter-heading" class="visually-hidden">Filter tasks</h2>
 
   <form action="/tasks" method="get"
         hx-get="/tasks/fragment"
         hx-target="#task-area"
-        hx-trigger="keyup changed delay:300ms, submit from:closest(form)"
+        hx-trigger="keyup changed delay:300ms, submit"
         hx-push-url="true">
 
     <label for="q">Filter tasks</label>
@@ -38,16 +49,18 @@
   </form>
 </section>
 
+
+{# ===============================
+   Task list area (HTMX updates only this)
+   =============================== #}
 <section aria-labelledby="list-heading">
-  <h2 id="list-heading">Current tasks ({{ page.totalItems }})</h2>
-  <img src="/static/img/icon.png" width="16" height="16" alt="">
+  <h2 id="list-heading">
+    Current tasks ({{ page.totalItems }})
+  </h2>
 
   <div id="task-area">
-
     {% include "tasks/_list.peb" with {"page": page, "query": query} %}
-
     {% include "tasks/_pager.peb" with {"page": page, "query": query} %}
-
   </div>
 </section>
 
